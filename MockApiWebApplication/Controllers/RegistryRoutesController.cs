@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using MockApiWebApplication.Models;
-using System.Text.Json;
 
 namespace MockApiWebApplication.Controllers
 {
