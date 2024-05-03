@@ -1,5 +1,7 @@
 ﻿using MockApiWebApplication.Models;
 using MockContentGenerator;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 
 namespace MockApiWebApplication.Middleware;
 
@@ -34,6 +36,19 @@ public class ApiDictionaryRoutingMiddleware
             {
                 await Task.Delay(apiValuedRoute.LatencyInSec.Value * 1000); // in sec
             }
+            
+            // authorization validation ?
+            if (apiValuedRoute.IsAuthorizationValidate.GetValueOrDefault())
+            {
+                var authValidated = AuthorizationValidate(context.Request, apiValuedRoute);
+                if (!authValidated.isValid)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    await context.Response.WriteAsync(authValidated.errorMessage!);
+                    return;
+                }
+            }
+
             context.Response.StatusCode = apiValuedRoute.HttpStatusCode ?? 200;
             context.Response.ContentType = "application/json; charset=utf-8";
             var jsonGeneratedContent = _contentGenerator.GenerateBySchema(apiValuedRoute.JsonSchema);
@@ -42,5 +57,31 @@ public class ApiDictionaryRoutingMiddleware
         }
 
         await _next(context);
+    }
+
+    private (bool isValid, string? errorMessage) AuthorizationValidate(HttpRequest request, ApiEndpointRule apiValuedRoute)
+    {
+        bool isValid = true;
+        string? errorMessage = default;
+        var authToken = request.Headers.Authorization.ToString();
+        if(string.IsNullOrEmpty(authToken))
+        {
+            isValid = false;
+            errorMessage = "Authorization Header is missed";
+        }
+        else
+        {
+            if(authToken.StartsWith("Bearer "))
+            {
+                var jwtToken = new JwtSecurityToken(authToken.Substring(7));
+                if(jwtToken.Issuer != apiValuedRoute.Authority)
+                {
+                    isValid = false;
+                    errorMessage = "Authorization Jwt Token Authority incorrect";
+                }
+            }
+        }
+        
+        return (isValid, errorMessage);
     }
 }

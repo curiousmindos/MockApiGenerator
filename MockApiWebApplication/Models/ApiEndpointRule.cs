@@ -8,5 +8,7 @@ public class ApiEndpointRule
     public string UrlEndpointPath { get; set; } = default!;
     public int? HttpStatusCode { get; set; }
     public int? LatencyInSec { get; set; }
+    public bool? IsAuthorizationValidate { get; set; }
+    public string? Authority { get; set; }
     public JsonDocument JsonSchema { get; set; } = default!;
 }
