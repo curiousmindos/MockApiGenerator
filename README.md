@@ -9,8 +9,9 @@ The target of this solution is to use this Web Application to register new Mock 
 - Http Response Code
 - API call latency
 
-  Sample of API registry Payload to create new API Url Endpoint with GET and 230 Code response and generated Mock Json Response based on input JsonSchema:
-  {
+Sample of API registry Payload to create new API Url Endpoint with GET and 230 Code response and generated Mock Json Response based on input JsonSchema:
+
+```{
   "httpMethod": "GET",
   "urlEndpointPath": "/my-customer-url-v2",
   "httpStatusCode": 220,
@@ -55,12 +56,15 @@ The target of this solution is to use this Web Application to register new Mock 
   }
  }
 }
+```
+Screenshots:
 
-Screen shots:
 1. POST Payload In Swagger:
+   
 ![image](https://github.com/curiousmindos/MockApiGenerator/assets/7238801/7a9e9420-638b-457b-8f46-9d0df13f1723)
 
-2. Sample how to use registered mock API endpoint
+3. Sample how to use registered mock API endpoint
+   
 ![image](https://github.com/curiousmindos/MockApiGenerator/assets/7238801/eb8ac6cc-0348-4e36-bfe3-31b040c613e8)
 
  
