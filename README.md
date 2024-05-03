@@ -1,15 +1,17 @@
-# MockApiWebApplication
+# Mock Api WebApplication
 
-This is ASP.Net Core solution with API controller endpoints 
+This is an ASP.Net Core solution with API controller endpoints. 
 
-The target of this solution is to use this Web Application to register new Mock API endpoints with settings
-- JsonSchema as Http Content Response
-- Url path
-- Http Method
-- Http Response Code
-- API call latency
+The goal is to use this web application to register new mock API endpoints with settings:
+- JSON Schema as HTTP Content Response
+- URL path
+- HTTP Method
+- HTTP Response Code API call latency
 
-Sample of API registry Payload to create new API Url Endpoint with GET and 230 Code response and generated Mock Json Response based on input JsonSchema:
+You can use this for your tests on the client side or for integrating with other APIs. 
+You can define API endpoints with expected behavior, response status code, and expected schema, API latency, etc.
+
+Here's an example of what the API registry payload looks like for creating a new API URL endpoint with a GET and 230 code response and a generated mock JSON response based on the input JSON schema:
 
 ```{
   "httpMethod": "GET",
