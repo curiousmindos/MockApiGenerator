@@ -13,7 +13,7 @@ public class JsonSchemaBuilder
         _faker = new Faker();
     }
 
-    public string Build(string jsonContent)
+    public (string jsonSerializedContent, ExpandoObject buildObject) Build(string jsonContent)
     {
         dynamic buildObject = new ExpandoObject();
         dynamic contentObject = JsonConvert.DeserializeObject(jsonContent)!;
@@ -23,8 +23,8 @@ public class JsonSchemaBuilder
         {
             AddValueProperty(buildObject, item, definitionsObjects);
         }
-        var res = JsonConvert.SerializeObject(buildObject);
-        return res;
+        var jsonSerializedContent = JsonConvert.SerializeObject(buildObject);
+        return (jsonSerializedContent, buildObject);
     }
 
     private void AddValueProperty(dynamic buildObject, dynamic item, IDictionary<string, dynamic> definitionsObjects)

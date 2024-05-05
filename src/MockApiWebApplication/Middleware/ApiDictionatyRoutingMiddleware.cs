@@ -52,7 +52,7 @@ public class ApiDictionaryRoutingMiddleware
             context.Response.StatusCode = apiValuedRoute.HttpStatusCode ?? 200;
             context.Response.ContentType = "application/json; charset=utf-8";
             var jsonGeneratedContent = _jsonSchemaBuilder.Build(apiValuedRoute.JsonSchema.RootElement.ToString()!);
-            await context.Response.WriteAsync(jsonGeneratedContent);
+            await context.Response.WriteAsync(jsonGeneratedContent.jsonSerializedContent);
             return;
         }
 

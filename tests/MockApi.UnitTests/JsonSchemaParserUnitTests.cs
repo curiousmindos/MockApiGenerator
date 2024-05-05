@@ -46,7 +46,7 @@ public class JsonSchemaParserUnitTests
 
         // Act
         var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult)!;            
+        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;            
         
         // Assert
         jsonResult.Should().NotBeNull();
@@ -111,7 +111,7 @@ public class JsonSchemaParserUnitTests
 
         // Act
         var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult)!;
+        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
 
         // Assert
         jsonResult.Should().NotBeNull();
