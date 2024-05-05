@@ -1,5 +1,5 @@
-﻿using MockApiWebApplication.Models;
-using MockContentGenerator;
+﻿using MockApi.ContentGenerator;
+using MockApiWebApplication.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 
@@ -9,13 +9,13 @@ public class ApiDictionaryRoutingMiddleware
 {
     private readonly ApplicationCache<ApiEndpointRule> _memoryCache;
     private readonly RequestDelegate _next;
-    private readonly ContentGenerator _contentGenerator;
+    private readonly JsonSchemaBuilder _jsonSchemaBuilder;
 
     public ApiDictionaryRoutingMiddleware(RequestDelegate next, ApplicationCache<ApiEndpointRule> memoryCache)
     {
         _next = next;
         _memoryCache = memoryCache;
-        _contentGenerator = new ContentGenerator();
+        _jsonSchemaBuilder = new JsonSchemaBuilder();
     }
 
     public async Task Invoke(HttpContext context)
@@ -51,7 +51,7 @@ public class ApiDictionaryRoutingMiddleware
 
             context.Response.StatusCode = apiValuedRoute.HttpStatusCode ?? 200;
             context.Response.ContentType = "application/json; charset=utf-8";
-            var jsonGeneratedContent = _contentGenerator.GenerateBySchema(apiValuedRoute.JsonSchema);
+            var jsonGeneratedContent = _jsonSchemaBuilder.Build(apiValuedRoute.JsonSchema.RootElement.ToString()!);
             await context.Response.WriteAsync(jsonGeneratedContent);
             return;
         }

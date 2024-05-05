@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MockContentGenerator\MockContentGenerator.csproj" />
+    <ProjectReference Include="..\MockContentGenerator\MockApi.ContentGenerator.csproj" />
   </ItemGroup>
 
 </Project>
