@@ -39,7 +39,7 @@ public class JsonSchemaBuilder
             if (@ref is not null)
             {
                 var refName = @ref.Value;
-                var innerObject = definitionsObjects[refName];
+                var innerObject = definitionsObjects[$"{refName}#0"];
                 ((IDictionary<string, object>)buildObject).Add(propName, innerObject);
             }
             else
@@ -49,12 +49,12 @@ public class JsonSchemaBuilder
                     var array = new List<dynamic>();
                     var items = value.items;
                     var @refItems = items["$ref"];
-                    for (int idx = 0; idx < _faker.Random.Int(1, 3); idx++)
+                    for (int idx = 0; idx < _faker.Random.Int(1, 5); idx++)
                     {
                         if (@refItems is not null)
                         {
                             //$ref type
-                            var innerObject = definitionsObjects[@refItems.ToString()];
+                            var innerObject = definitionsObjects[$"{@refItems}#{idx}"];
                             array.Add(innerObject);
                         }
                         else
@@ -64,7 +64,6 @@ public class JsonSchemaBuilder
                             var arrayItemFormat = items["format"];
                             var arrayMockValue = BuildMockValue(arrayItemType.ToString(), arrayItemFormat?.ToString() ?? default);
                             array.Add(arrayMockValue);
-                            //((IDictionary<string, object>)buildObject).Add(propName, arrayMockValue);
                         }
                     }
                     ((IDictionary<string, object>)buildObject).Add(propName, array);
@@ -85,23 +84,27 @@ public class JsonSchemaBuilder
         foreach (var definition in definitions)
         {
             var properties = (IEnumerable<dynamic>)definition.Value.properties;
-            dynamic definitionsObject = new ExpandoObject();
-            foreach (var property in properties)
+            //generate multiple mock items for advance
+            for (int idx = 0; idx < 100; idx++)
             {
-                var propName = property.Name;
-                var value = property.Value;
-                if (property.HasValues)
+                dynamic definitionsObject = new ExpandoObject();
+                foreach (var property in properties)
                 {
-                    var propertyType = value.type;
-                    var format = value.format;
-                    var @ref = value["$ref"];
-                    if (@ref is not null)
-                        continue;
-                    var mockValue = BuildMockValue(propertyType.ToString(), format?.ToString() ?? default);
-                    ((IDictionary<string, object>)definitionsObject).Add(propName, mockValue);
+                    var propName = property.Name;
+                    var value = property.Value;
+                    if (property.HasValues)
+                    {
+                        var propertyType = value.type;
+                        var format = value.format;
+                        var @ref = value["$ref"];
+                        if (@ref is not null)
+                            continue;
+                        var mockValue = BuildMockValue(propertyType.ToString(), format?.ToString() ?? default);
+                        ((IDictionary<string, object>)definitionsObject).Add(propName, mockValue);
+                    }
                 }
+                _definitions.Add($"#/definitions/{definition.Name}#{idx}", definitionsObject);
             }
-            _definitions.Add($"#/definitions/{definition.Name}", definitionsObject);
         }
         return _definitions;
     }
