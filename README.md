@@ -21,7 +21,7 @@ You can define API endpoints with expected behavior, response status code, and e
   "urlEndpointPath": "/my-customer-url-v2",
   "responseMessage": "Single Response with This URL Request",
   "httpStatusCode": 200,
-  "latencyInMilliseconds": 200
+  "latencyInMilliseconds": 300
 }
 ```
 2. with Authorization validation
@@ -144,12 +144,23 @@ You can define API endpoints with expected behavior, response status code, and e
 Sample Response for Sample 5
 ```
 {
-  "firstName": "spglf",
-  "lastName": "aorxb",
-  "inner": {
-      "Id": 4592422217
-    },{
-      "Id": 4592422327
+  "firstName": "fuacq",
+  "lastName": "tpdqi",
+  "birthDate": "2024-05-06T17:48:52.9297819-04:00",
+  "modifiedDate": "2024-05-07T09:31:36.0443116-04:00",
+  "identifierNumber": 1273046372,
+  "bookingId": 1574661347,
+  "bolleanFlag": false,
+  "inner": [
+    {
+      "Id": 319,
+      "Name": "pkdvd",
+      "Type": "tpdqiert"
+    },
+    {
+      "Id": 368,
+      "Name": "tpdqitet",
+      "Type": "uuqug"
     }
   ]
 }
