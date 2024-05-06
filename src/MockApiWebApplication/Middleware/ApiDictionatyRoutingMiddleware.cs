@@ -32,9 +32,9 @@ public class ApiDictionaryRoutingMiddleware
 
         if (isMessageBodyReceiverConsumerExist)
         {
-            if (apiValuedRoute.LatencyInSec.HasValue)
+            if (apiValuedRoute.LatencyInMilliseconds.HasValue)
             {
-                await Task.Delay(apiValuedRoute.LatencyInSec.Value * 1000); // in sec
+                await Task.Delay(apiValuedRoute.LatencyInMilliseconds.Value); // in Milliseconds
             }
             
             // authorization validation ?
