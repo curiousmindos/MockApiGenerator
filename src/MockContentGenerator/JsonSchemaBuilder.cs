@@ -18,7 +18,7 @@ public class JsonSchemaBuilder
         dynamic buildObject = new ExpandoObject();
         dynamic contentObject = JsonConvert.DeserializeObject(jsonContent)!;
         var definitions = (IEnumerable<dynamic>)contentObject.definitions;
-        dynamic definitionsObjects = definitions != null ?  ParseDefinitions(definitions) : default!;
+        dynamic definitionsObjects = definitions != null ? ParseDefinitions(definitions) : default!;
         foreach (var item in (IEnumerable<dynamic>)contentObject.properties)
         {
             AddValueProperty(buildObject, item, definitionsObjects);
@@ -44,8 +44,37 @@ public class JsonSchemaBuilder
             }
             else
             {
-                var mockValue = BuildMockValue(type.ToString(), format?.ToString() ?? default);
-                ((IDictionary<string, object>)buildObject).Add(propName, mockValue);
+                if (type == "array")
+                {
+                    var array = new List<dynamic>();
+                    var items = value.items;
+                    var @refItems = items["$ref"];
+                    for (int idx = 0; idx < _faker.Random.Int(1, 3); idx++)
+                    {
+                        if (@refItems is not null)
+                        {
+                            //$ref type
+                            var innerObject = definitionsObjects[@refItems.ToString()];
+                            array.Add(innerObject);
+                        }
+                        else
+                        {
+                            // system types
+                            var arrayItemType = items["type"];
+                            var arrayItemFormat = items["format"];
+                            var arrayMockValue = BuildMockValue(arrayItemType.ToString(), arrayItemFormat?.ToString() ?? default);
+                            array.Add(arrayMockValue);
+                            //((IDictionary<string, object>)buildObject).Add(propName, arrayMockValue);
+                        }
+                    }
+                    ((IDictionary<string, object>)buildObject).Add(propName, array);
+                }
+                else
+                {
+                    // single property
+                    var mockValue = BuildMockValue(type.ToString(), format?.ToString() ?? default);
+                    ((IDictionary<string, object>)buildObject).Add(propName, mockValue);
+                }
             }
         }
     }
