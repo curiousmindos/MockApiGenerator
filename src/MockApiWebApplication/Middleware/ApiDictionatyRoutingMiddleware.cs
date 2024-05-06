@@ -35,8 +35,7 @@ public class ApiDictionaryRoutingMiddleware
             if (apiValuedRoute.LatencyInMilliseconds.HasValue)
             {
                 await Task.Delay(apiValuedRoute.LatencyInMilliseconds.Value); // in Milliseconds
-            }
-            
+            }            
             // authorization validation ?
             if (apiValuedRoute.IsAuthorizationValidate.GetValueOrDefault())
             {
@@ -51,6 +50,11 @@ public class ApiDictionaryRoutingMiddleware
 
             context.Response.StatusCode = apiValuedRoute.HttpStatusCode ?? 200;
             context.Response.ContentType = "application/json; charset=utf-8";
+            if (!string.IsNullOrEmpty(apiValuedRoute.ResponseMessage))
+            {
+                await context.Response.WriteAsync(apiValuedRoute.ResponseMessage!);
+                return;
+            }
             var jsonGeneratedContent = _jsonSchemaBuilder.Build(apiValuedRoute.JsonSchema.RootElement.ToString()!);
             await context.Response.WriteAsync(jsonGeneratedContent.jsonSerializedContent);
             return;
