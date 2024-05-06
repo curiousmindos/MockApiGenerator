@@ -8,8 +8,8 @@ The goal is to use this web application to register new mock API endpoints with 
 - URL path
 - HTTP Method
 - HTTP Response Code API call latency (optional)
-- Validate Auhtorization header (optional)
-- Validate JWT Autority token (optional)
+- Validate Authorization header (optional)
+- Validate JWT Authority source claim (optional)
 
 You can use this for your tests on the client side or for integrating with other APIs. 
 You can define API endpoints with expected behavior, response status code, and expected schema, API latency, etc.
