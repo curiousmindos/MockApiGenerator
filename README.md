@@ -107,7 +107,7 @@ You can define API endpoints with expected behavior, response status code, and e
 {
   "httpMethod": "GET",
   "urlEndpointPath": "/my-customer-url-v2",
-  "httpStatusCode": 204,
+  "httpStatusCode": 200,
   "jsonSchema": {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "GuestMessage",
@@ -119,6 +119,23 @@ You can define API endpoints with expected behavior, response status code, and e
       },
       "lastName": {
         "type": "string"
+      },
+      "birthDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "modifiedDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "identifierNumber": {
+        "type": "integer"
+      },
+      "bookingId": {
+        "type": "number"
+      },
+      "booleanFlag": {
+        "type": "boolean"
       },
       "inner": {
         "type": "array",
@@ -134,6 +151,12 @@ You can define API endpoints with expected behavior, response status code, and e
         "properties": {
           "Id": {
             "type": "number"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
           }
         }
       }
@@ -152,7 +175,7 @@ GET: http://***your-base-address***/my-customer-url-v2
   "modifiedDate": "2024-05-07T09:31:36.0443116-04:00",
   "identifierNumber": 1273046372,
   "bookingId": 1574661347,
-  "bolleanFlag": false,
+  "booleanFlag": false,
   "inner": [
     {
       "Id": 319,
