@@ -141,7 +141,9 @@ You can define API endpoints with expected behavior, response status code, and e
   }
 }
 ```
-Sample Response for Sample 5
+Sample Mock API Response for Sample 5
+GET: http://***your-base-address***/my-customer-url-v2
+
 ```
 {
   "firstName": "fuacq",
