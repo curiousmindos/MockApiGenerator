@@ -58,6 +58,63 @@ public class JsonSchemaParserUnitTests
     }
 
     [Fact]
+    public void Parse_JsonSchema_CreateObjectWithNullableProperties()
+    {
+        // Arrange
+        JsonSchemaBuilder cg = new JsonSchemaBuilder();
+        var jsonString = @"{
+                  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                  ""title"": ""GuestEnrollmentMessage"",
+                  ""type"": ""object"",
+                  ""additionalProperties"": false,
+                  ""required"": [
+                    ""firstName"",
+                    ""lastName"",
+                    ""birthDate"",
+                    ""identifierNumber"",
+                    ""optInFlag""
+                  ],
+                  ""properties"": {
+                    ""firstName"": {
+                      ""type"": [
+                        ""null"",
+                        ""string""
+                      ]
+                    },
+                    ""lastName"": {
+                      ""type"": ""string""
+                    },
+                    ""birthDate"": {
+                      ""type"": ""string"",
+                      ""format"": ""date-time""
+                    },
+                    ""identifierNumber"": {
+                      ""type"": [
+                        ""integer"",
+                        ""null""
+                      ],
+                      ""format"": ""int32""
+                    },
+                    ""optInFlag"": {
+                      ""type"": ""boolean""
+                    }
+                  }
+                }";
+
+        // Act
+        var jsonResult = cg.Build(jsonString);
+        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
+
+        // Assert
+        jsonResult.Should().NotBeNull();
+        ((object)dynamicResult.birthDate).Should().NotBeNull();
+        ((string)dynamicResult.firstName).Should().NotBeNull();
+
+        bool birthDateString = DateTime.TryParse(dynamicResult.birthDate.ToString(), out DateTime resultDateTime);
+        birthDateString.Should().BeTrue();
+    }
+
+    [Fact]
     public void Parse_JsonSchemaWithInnerObject_CreateObjectWithInnerObject()
     {
         // Arrange

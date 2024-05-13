@@ -1,0 +1,59 @@
+{
+  "httpMethod": "GET",
+  "urlEndpointPath": "/my-customer-url-v2",
+  "httpStatusCode": 200,
+  "jsonSchema": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "GuestMessage",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "firstName": {
+        "type": "string"
+      },
+      "lastName": {
+        "type": "string"
+      },
+      "birthDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "modifiedDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "identifierNumber": {
+        "type": "integer"
+      },
+      "bookingId": {
+        "type": "number"
+      },
+      "booleanFlag": {
+        "type": "boolean"
+      },
+      "inner": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Inner"
+        }
+      }
+    },
+    "definitions": {
+      "Inner": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "number"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Dynamic;
 
 namespace MockApi.ContentGenerator;
@@ -44,7 +45,16 @@ public class JsonSchemaBuilder
             }
             else
             {
-                if (type == "array")
+                if (type is JArray)
+                {
+                    var isNull = ((JArray)type).FirstOrDefault(c => c.ToString() == "null");
+                    var nullableType = ((JArray)type).FirstOrDefault(c => c.ToString() != "null");
+
+                    // single Nullable property
+                    var mockValue = BuildMockValue(nullableType.ToString(), format?.ToString() ?? default, true);
+                    ((IDictionary<string, object>)buildObject).Add(propName, mockValue);
+                }
+                else  if (type == "array")
                 {
                     var array = new List<dynamic>();
                     var items = value.items;
@@ -109,8 +119,13 @@ public class JsonSchemaBuilder
         return _definitions;
     }
 
-    public object BuildMockValue(string? valueType, string? valueFormat)
+    public object BuildMockValue(string? valueType, string? valueFormat, bool isNullable = false)
     {
+        if(isNullable && _faker.Random.Bool())
+        {
+            return default!;
+        }
+
         switch (valueType)
         {
             case "string":
@@ -125,6 +140,13 @@ public class JsonSchemaBuilder
                     return _faker.Random.String2(5);
                 }
             case "integer":
+                if (!string.IsNullOrEmpty(valueFormat))
+                {
+                    if (valueFormat == "int32")
+                    {
+                        return _faker.Random.Int();
+                    }
+                }
                 return _faker.Random.Int();
             case "number":
                 return _faker.Random.Int(100);
