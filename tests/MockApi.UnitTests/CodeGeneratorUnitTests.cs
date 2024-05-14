@@ -1,70 +1,18 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using MockApi.ContentGenerator;
-using Newtonsoft.Json;
 
 namespace MockApi.UnitTests;
 
-public class JsonSchemaParserUnitTests
+public class CodeGeneratorUnitTests
 {
-
     [Fact]
-    public void Parse_JsonSchema_CreateObjectWithProperties()
+    public void Generate_JsonSchemaWithFlat_CreateCSharpClassesStringBuilder()
     {
         // Arrange
         JsonSchemaBuilder cg = new JsonSchemaBuilder();
         var jsonString = @"{
                   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-                  ""title"": ""GuestEnrollmentMessage"",
-                  ""type"": ""object"",
-                  ""additionalProperties"": false,
-                  ""required"": [
-                    ""firstName"",
-                    ""lastName"",
-                    ""birthDate"",
-                    ""identifierNumber"",
-                    ""optInFlag""
-                  ],
-                  ""properties"": {
-                    ""firstName"": {
-                      ""type"": ""string""
-                    },
-                    ""lastName"": {
-                      ""type"": ""string""
-                    },
-                    ""birthDate"": {
-                      ""type"": ""string"",
-                      ""format"": ""date-time""
-                    },
-                    ""identifierNumber"": {
-                      ""type"": ""string""
-                    },
-                    ""optInFlag"": {
-                      ""type"": ""boolean""
-                    }
-                  }
-                }";
-
-        // Act
-        var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;            
-        
-        // Assert
-        jsonResult.Should().NotBeNull();
-        ((object)dynamicResult.birthDate).Should().NotBeNull();
-        ((string)dynamicResult.firstName).Should().NotBeNull();
-        
-        bool birthDateString = DateTime.TryParse(dynamicResult.birthDate.ToString(), out DateTime resultDateTime);
-        birthDateString.Should().BeTrue();
-    }
-
-    [Fact]
-    public void Parse_JsonSchema_CreateObjectWithNullableProperties()
-    {
-        // Arrange
-        JsonSchemaBuilder cg = new JsonSchemaBuilder();
-        var jsonString = @"{
-                  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-                  ""title"": ""GuestEnrollmentMessage"",
+                  ""title"": ""GuestMessage"",
                   ""type"": ""object"",
                   ""additionalProperties"": false,
                   ""required"": [
@@ -89,11 +37,7 @@ public class JsonSchemaParserUnitTests
                       ""format"": ""date-time""
                     },
                     ""identifierNumber"": {
-                      ""type"": [
-                        ""integer"",
-                        ""null""
-                      ],
-                      ""format"": ""int32""
+                      ""type"": ""string""
                     },
                     ""optInFlag"": {
                       ""type"": ""boolean""
@@ -102,26 +46,24 @@ public class JsonSchemaParserUnitTests
                 }";
 
         // Act
-        var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
+        CSharpClassGenerator cSharpClassGenerator = new();
+        var result = cSharpClassGenerator.CodeGenerate(jsonString).ToString();
 
         // Assert
-        jsonResult.Should().NotBeNull();
-        ((object)dynamicResult.birthDate).Should().NotBeNull();
-        ((string)dynamicResult.lastName).Should().NotBeNull();
-
-        bool birthDateString = DateTime.TryParse(dynamicResult.birthDate.ToString(), out DateTime resultDateTime);
-        birthDateString.Should().BeTrue();
+        result.Should().NotBeNull();
+        result.Should().Contain("public class GuestMessage");
+        result.Should().Contain("public string? FirstName");
+        result.Should().Contain("public DateTime BirthDate");
     }
 
     [Fact]
-    public void Parse_JsonSchemaWithInnerObject_CreateObjectWithInnerObject()
+    public void Generate_JsonSchemaWithReferenceObject_CreateCSharpClassesStringBuilder()
     {
         // Arrange
         JsonSchemaBuilder cg = new JsonSchemaBuilder();
         var jsonString = @"{
                   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-                  ""title"": ""GuestEnrollmentMessage"",
+                  ""title"": ""GuestMessage"",
                   ""type"": ""object"",
                   ""additionalProperties"": false,
                   ""required"": [
@@ -129,12 +71,14 @@ public class JsonSchemaParserUnitTests
                     ""lastName"",
                     ""birthDate"",
                     ""identifierNumber"",
-                    ""optInFlag"",
-                    ""inner""
+                    ""optInFlag""
                   ],
                   ""properties"": {
                     ""firstName"": {
-                      ""type"": ""string""
+                      ""type"": [
+                        ""null"",
+                        ""string""
+                      ]
                     },
                     ""lastName"": {
                       ""type"": ""string""
@@ -160,23 +104,28 @@ public class JsonSchemaParserUnitTests
                       ""properties"": {
                         ""Id"": {
                           ""type"": ""string""
-                        }
+                        },
+                        ""Index"": {
+                          ""type"": ""integer""
+                        },
                       }
                     }
                   }
-                }";            
+                }";
 
         // Act
-        var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
+        CSharpClassGenerator cSharpClassGenerator = new();
+        var result = cSharpClassGenerator.CodeGenerate(jsonString).ToString();
 
         // Assert
-        jsonResult.Should().NotBeNull();
-        ((object)dynamicResult.inner).Should().NotBeNull();
+        result.Should().NotBeNull();
+        result.Should().Contain("public class GuestMessage");
+        result.Should().Contain("public string? FirstName");
+        result.Should().Contain("public Inner Inner");
     }
 
     [Fact]
-    public void Parse_JsonSchemaWithRefArray_CreateObjectWithCollection()
+    public void Generate_JsonSchemaWithCollectionAndReferenceObject_CreateCSharpClassesStringBuilder()
     {
         // Arrange
         JsonSchemaBuilder cg = new JsonSchemaBuilder();
@@ -192,7 +141,7 @@ public class JsonSchemaParserUnitTests
                     ""lastName"": {
                       ""type"": ""string""
                     },                    
-                    ""inner"": {
+                    ""inners"": {
                       ""type"": ""array"",
                       ""items"": {
                         ""$ref"": ""#/definitions/Inner""
@@ -213,39 +162,41 @@ public class JsonSchemaParserUnitTests
                 }";
 
         // Act
-        var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
+        CSharpClassGenerator cSharpClassGenerator = new();
+        var result = cSharpClassGenerator.CodeGenerate(jsonString).ToString();
 
         // Assert
-        jsonResult.Should().NotBeNull();
-        ((object)dynamicResult.inner).Should().NotBeNull();
-        ((object)dynamicResult.inner).Should().BeOfType<Newtonsoft.Json.Linq.JArray>();
-        var collection = ((object)dynamicResult.inner) as Newtonsoft.Json.Linq.JArray;
-        collection?.Count.Should().BeGreaterThan(0);
+        result.Should().NotBeNull();
+        result.Should().Contain("public class GuestMessage");
+        result.Should().Contain("public string? FirstName");
+        result.Should().Contain("public Inner Inner");
+        result.Should().Contain("public ICollection<Inner> Inners");
     }
 
     [Fact]
-    public void Parse_JsonSchemaWithNumberArray_CreateObjectWithCollection()
+    public void Generate_JsonSchemaWithNestedReferenceObject_CreateCSharpClassesStringBuilder()
     {
         // Arrange
         JsonSchemaBuilder cg = new JsonSchemaBuilder();
         var jsonString = @"{
                   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-                  ""title"": ""GuestEnrollmentMessage"",
+                  ""title"": ""GuestMessage"",
                   ""type"": ""object"",
                   ""additionalProperties"": false,                  
                   ""properties"": {
                     ""firstName"": {
-                      ""type"": ""string""
+                      ""type"": [
+                        ""null"",
+                        ""string""
+                      ]
                     },
                     ""lastName"": {
                       ""type"": ""string""
                     },                    
-                    ""numberArray"": {
+                    ""inners"": {
                       ""type"": ""array"",
                       ""items"": {
-                        ""type"": ""integer"",
-                        ""format"": ""int32""
+                        ""$ref"": ""#/definitions/Inner""
                       }
                     }
                   },
@@ -256,21 +207,44 @@ public class JsonSchemaParserUnitTests
                       ""properties"": {
                         ""Id"": {
                           ""type"": ""string""
-                        }
+                        },
+                        ""Product"": {
+                          ""$ref"": ""#/definitions/Product""
+                        },
                       }
+                    },
+                  ""Product"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                        ""id"": {
+                          ""type"": [
+                            ""null"",
+                            ""string""
+                          ]
+                        },
+                        ""code"": {
+                          ""type"": ""string""
+                        },
+                        ""category"": {
+                          ""type"": ""string""
+                        }
                     }
+                   }
                   }
                 }";
 
         // Act
-        var jsonResult = cg.Build(jsonString);
-        dynamic dynamicResult = JsonConvert.DeserializeObject(jsonResult.jsonSerializedContent)!;
+        CSharpClassGenerator cSharpClassGenerator = new();
+        var result = cSharpClassGenerator.CodeGenerate(jsonString).ToString();
 
         // Assert
-        jsonResult.Should().NotBeNull();
-        ((object)dynamicResult.numberArray).Should().NotBeNull();
-
-        var collection = ((object)dynamicResult.numberArray) as Newtonsoft.Json.Linq.JArray;
-        collection?.Count.Should().BeGreaterThan(0);
+        result.Should().NotBeNull();
+        result.Should().Contain("public class GuestMessage");
+        result.Should().Contain("public string? FirstName");
+        result.Should().Contain("public class Inner");
+        result.Should().Contain("public class Product");
+        result.Should().Contain("public Product Product");
+        result.Should().Contain("public ICollection<Inner> Inners");
     }
 }

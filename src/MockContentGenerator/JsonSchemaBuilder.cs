@@ -14,18 +14,22 @@ public class JsonSchemaBuilder
         _faker = new Faker();
     }
 
-    public (string jsonSerializedContent, ExpandoObject buildObject) Build(string jsonContent)
+    public (string jsonSerializedContent, ExpandoObject buildObject, string rootTitle) Build(string jsonContent)
     {
         dynamic buildObject = new ExpandoObject();
         dynamic contentObject = JsonConvert.DeserializeObject(jsonContent)!;
+        
+        
         var definitions = (IEnumerable<dynamic>)contentObject.definitions;
         dynamic definitionsObjects = definitions != null ? ParseDefinitions(definitions) : default!;
+        
         foreach (var item in (IEnumerable<dynamic>)contentObject.properties)
         {
             AddValueProperty(buildObject, item, definitionsObjects);
         }
+
         var jsonSerializedContent = JsonConvert.SerializeObject(buildObject);
-        return (jsonSerializedContent, buildObject);
+        return (jsonSerializedContent, buildObject, contentObject.title);
     }
 
     private void AddValueProperty(dynamic buildObject, dynamic item, IDictionary<string, dynamic> definitionsObjects)
